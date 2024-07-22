@@ -20,28 +20,98 @@
       Telegram.WebApp.onEvent("themeChanged", setThemeClass);
       setThemeClass();
 
-      //   function openFullscreen() {
-      //     if (document.documentElement.requestFullscreen) {
-      //       document.documentElement.requestFullscreen();
-      //     } else if (document.documentElement.mozRequestFullScreen) {
-      //       // Firefox
-      //       document.documentElement.mozRequestFullScreen();
-      //     } else if (document.documentElement.webkitRequestFullscreen) {
-      //       // Chrome, Safari, and Opera
-      //       document.documentElement.webkitRequestFullscreen();
-      //     } else if (document.documentElement.msRequestFullscreen) {
-      //       // IE/Edge
-      //       document.documentElement.msRequestFullscreen();
-      //     }
-      //   }
-
       window.addEventListener("load", function () {
         openFullscreen();
       });
     </script>
-    <title></title>
+    <title>Target Shooting Game</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #282c34;
+        color: white;
+        font-family: Arial, sans-serif;
+      }
+
+      #game-container {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        border: 2px solid #fff;
+        overflow: hidden;
+      }
+
+      #target {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: red;
+        border-radius: 50%;
+        display: none;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello World</h1>
+    <div id="game-container">
+      <div id="target"></div>
+    </div>
+    <script>
+      const gameContainer = document.getElementById("game-container");
+      const target = document.getElementById("target");
+
+      let score = 0;
+
+      function getRandomPosition() {
+        const containerRect = gameContainer.getBoundingClientRect();
+        const targetSize = target.offsetWidth;
+
+        const maxX = containerRect.width - targetSize;
+        const maxY = containerRect.height - targetSize;
+
+        const randomX = Math.floor(Math.random() * maxX);
+        const randomY = Math.floor(Math.random() * maxY);
+
+        return { x: randomX, y: randomY };
+      }
+
+      function showTarget() {
+        const position = getRandomPosition();
+        target.style.left = `${position.x}px`;
+        target.style.top = `${position.y}px`;
+        target.style.display = "block";
+
+        setTimeout(() => {
+          target.style.display = "none";
+          setTimeout(showTarget, 1000); // Target reappears after 1 second
+        }, 1000); // Target disappears after 1 second
+      }
+
+      gameContainer.addEventListener("click", (event) => {
+        const rect = target.getBoundingClientRect();
+        const x = event.clientX;
+        const y = event.clientY;
+
+        if (
+          x >= rect.left &&
+          x <= rect.right &&
+          y >= rect.top &&
+          y <= rect.bottom
+        ) {
+          score++;
+          target.style.display = "none";
+          console.log("Score:", score);
+          setTimeout(showTarget, 500); // Target reappears after 0.5 seconds
+        } else {
+          console.log("Missed!");
+        }
+      });
+
+      showTarget();
+    </script>
   </body>
 </html>
